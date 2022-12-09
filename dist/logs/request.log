@@ -1,0 +1,8 @@
+{"level":"info","message":" [09/12/2022 03:06:53] GET : / (function status(code) {\n  if ((typeof code === 'string' || Math.floor(code) !== code) && code > 99 && code < 1000) {\n    deprecate('res.status(' + JSON.stringify(code) + '): use res.status(' + Math.floor(code) + ') instead')\n  }\n  this.statusCode = code;\n  return this;\n})"}
+{"level":"info","message":" [09/12/2022 03:08:17] GET : / (200)"}
+{"level":"info","message":" [09/12/2022 03:08:40] GET : / (200)"}
+{"level":"info","message":" [09/12/2022 03:09:07] GET : \"/\" (200)"}
+{"level":"info","message":" [09/12/2022 03:09:20] GET : '/' (200)"}
+{"level":"info","message":" [09/12/2022 15:10:22] GET : '/' (200)"}
+{"level":"info","message":" [09/12/2022 15:10:27] GET : '/' (200)"}
+{"level":"info","message":" [09/12/2022 15:10:59] [GET] : '/' (200)"}
