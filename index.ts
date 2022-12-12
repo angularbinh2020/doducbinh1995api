@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import requestLogger from "./middlewares/request-logger";
+import { createRoleTable } from "./database/role-table";
 
 dotenv.config();
 
@@ -10,7 +11,13 @@ const port = process.env.PORT;
 app.use(requestLogger);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server 11");
+  createRoleTable()
+    .then(() => {
+      res.send("Create success");
+    })
+    .catch(() => {
+      res.send("Create failed");
+    });
 });
 
 app.listen(port, () => {
