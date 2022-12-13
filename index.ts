@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import requestLogger from "./middlewares/request-logger";
-import { createRoleTable } from "./database/role-table";
+import { createUserTable } from "./database/user-table";
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ const port = process.env.PORT;
 app.use(requestLogger);
 
 app.get("/", (req: Request, res: Response) => {
-  createRoleTable()
+  createUserTable()
     .then(() => {
       res.send("Create success");
     })

@@ -19,3 +19,10 @@
 {"level":"info","message":" [12/12/2022 17:25:27] [GET] : '/' (200)"}
 {"level":"info","message":" [12/12/2022 17:26:39] [GET] : '/' (200)"}
 {"level":"info","message":" [12/12/2022 17:26:54] [GET] : '/' (200)"}
+{"level":"info","message":" [13/12/2022 17:04:27] [GET] : '/' (200)"}
+{"level":"info","message":" [13/12/2022 17:04:28] [GET] : '/favicon.ico' (200)"}
+{"level":"info","message":" [13/12/2022 17:04:43] [GET] : '/' (200)"}
+{"level":"info","message":" [13/12/2022 17:18:01] [GET] : '/' (200)"}
+{"level":"info","message":" [13/12/2022 17:19:24] [GET] : '/' (200)"}
+{"level":"info","message":" [13/12/2022 17:19:29] [GET] : '/' (200)"}
+{"level":"info","message":" [13/12/2022 17:20:50] [GET] : '/' (200)"}
