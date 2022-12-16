@@ -4,21 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const request_logger_1 = __importDefault(require("./middlewares/request-logger"));
-const user_table_1 = require("./database/user-table");
-dotenv_1.default.config();
+const cors_1 = __importDefault(require("cors"));
+const cors_2 = require("./configs/cors");
 const app = (0, express_1.default)();
 const port = process.env.PORT;
+app.use((0, cors_1.default)(cors_2.CORS_OPTIONS));
 app.use(request_logger_1.default);
 app.get("/", (req, res) => {
-    (0, user_table_1.createUserTable)()
-        .then(() => {
-        res.send("Create success");
-    })
-        .catch(() => {
-        res.send("Create failed");
-    });
+    res.status(200);
+    res.send("test failed");
 });
 app.listen(port, () => {
     console.log(`[server]: Server is running at https://localhost:${port}`);

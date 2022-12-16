@@ -1,23 +1,17 @@
 import express, { Express, Request, Response } from "express";
-import dotenv from "dotenv";
 import requestLogger from "./middlewares/request-logger";
-import { createUserTable } from "./database/user-table";
-
-dotenv.config();
+import cors from "cors";
+import { CORS_OPTIONS } from "./configs/cors";
 
 const app: Express = express();
 const port = process.env.PORT;
 
+app.use(cors(CORS_OPTIONS))
 app.use(requestLogger);
 
 app.get("/", (req: Request, res: Response) => {
-  createUserTable()
-    .then(() => {
-      res.send("Create success");
-    })
-    .catch(() => {
-      res.send("Create failed");
-    });
+  res.status(200)
+  res.send("test failed");
 });
 
 app.listen(port, () => {

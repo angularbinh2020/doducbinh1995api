@@ -1,7 +1,7 @@
 import { DB_CONNECTION } from "../configs/database";
 import mysql from "mysql";
 import logger from "./logger";
-import { IDbQueryResult } from "models/IDbQuery";
+import { IDbQueryResult } from "../models/IDbQuery";
 
 const connection = mysql.createConnection(DB_CONNECTION);
 
