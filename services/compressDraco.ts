@@ -19,23 +19,27 @@ export async function CompressDraco() {
   logger.info("start compress");
   const encoder = new encoderModule.Encoder();
   const meshBuilder = new encoderModule.MeshBuilder();
-//   const response = await axios(
-//     "https://apiclient.wallmarttech.com:6006/files/221222-225101_OBJ-ba16.zip",
-//     {
-//       method: "GET",
-//       responseType: "blob",
-//     }
-//   );
-
-  const response = await fetch(
+  const response = await axios(
     "https://apiclient.wallmarttech.com:6006/files/221222-225101_OBJ-ba16.zip",
     {
       method: "GET",
+      responseType: "blob",
     }
   );
+
+  //   const response = await fetch(
+  //     "https://apiclient.wallmarttech.com:6006/files/221222-225101_OBJ-ba16.zip",
+  //     {
+  //       method: "GET",
+  //     }
+  //   );
+  const fileZip = fs.readFileSync(
+    __dirname + "/221222-225101_OBJ-ba16 (1).zip"
+  );
+  const zip = await JSZip.loadAsync(fileZip);
   const isLoadSuccess = response.status === 200 || response.status === 0;
   if (isLoadSuccess) {
-    const zip = await JSZip.loadAsync(response.blob());
+    const zip = await JSZip.loadAsync(fileZip);
     let mtlFilePath = "";
     let objFile!: JSZip.JSZipObject;
     let mtlFile!: JSZip.JSZipObject;
