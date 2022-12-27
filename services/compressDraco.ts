@@ -1,41 +1,10 @@
-import assert from "assert";
 import draco3d from "draco3d";
 import JSZip from "jszip";
-
-import {
-  Vector2,
-  Raycaster,
-  PerspectiveCamera,
-  Intersection,
-  Mesh,
-  Line,
-  Vector3,
-  Clock,
-  WebGLRenderer,
-  Scene,
-  MeshStandardMaterial,
-  Line3,
-  Box3,
-  Matrix4,
-  BoxGeometry,
-  MeshBasicMaterial,
-  BufferGeometry,
-  LineSegments,
-  LineBasicMaterial,
-  LoadingManager,
-  Group,
-  AmbientLight,
-  PointsMaterial,
-  Color,
-  Points,
-} from "three";
-import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
-import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { DDSLoader } from "three/examples/jsm/loaders/DDSLoader";
-import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
-import { MeshBVH } from "three-mesh-bvh";
-import { PLYLoader } from "three/examples/jsm/loaders/PLYLoader";
+import fs from "fs";
+import axios from "axios";
+import { Mesh } from "three";
+import { OBJLoader } from "./OBJLoader";
+import logger from "./logger";
 
 let encoderModule!: draco3d.EncoderModule;
 
@@ -47,15 +16,23 @@ draco3d.createEncoderModule({}).then(function (module) {
 });
 
 export async function CompressDraco() {
+  logger.info("start compress");
   const encoder = new encoderModule.Encoder();
   const meshBuilder = new encoderModule.MeshBuilder();
-  const response: any = await fetch(
+//   const response = await axios(
+//     "https://apiclient.wallmarttech.com:6006/files/221222-225101_OBJ-ba16.zip",
+//     {
+//       method: "GET",
+//       responseType: "blob",
+//     }
+//   );
+
+  const response = await fetch(
     "https://apiclient.wallmarttech.com:6006/files/221222-225101_OBJ-ba16.zip",
     {
       method: "GET",
     }
   );
-
   const isLoadSuccess = response.status === 200 || response.status === 0;
   if (isLoadSuccess) {
     const zip = await JSZip.loadAsync(response.blob());
@@ -73,48 +50,110 @@ export async function CompressDraco() {
       if (relativePath.endsWith(".jpg")) textureFile = file;
       if (relativePath.endsWith(".ply")) plyFile = file;
     });
-    let mesh: Points | Group | null = null;
     if (plyFile) {
-      const loader = new PLYLoader();
-      const blob = await plyFile.async("blob");
-      const geometry = await loader.loadAsync(URL.createObjectURL(blob));
-      geometry.computeVertexNormals();
-      geometry.center();
-      const material = new PointsMaterial({
-        size: 0.03,
-        vertexColors: true,
+    } else {
+      const objContent = await objFile.async("blob");
+      //@ts-ignore
+      const group = await new OBJLoader().loadAsync(
+        URL.createObjectURL(objContent)
+      );
+      let indices: any[] = [];
+      let vertices: any = [];
+      let normals: any = [];
+      group.traverse((object: any) => {
+        if (object instanceof Mesh && object.geometry) {
+          const attributes = object.geometry.attributes;
+          attributes.normal.array.forEach(function (n: any) {
+            normals.push(n);
+          });
+          attributes.uv.array.forEach(function (u: any) {
+            indices.push(u);
+          });
+          attributes.position.array.forEach(function (p: any) {
+            vertices.push(p);
+          });
+        }
       });
-      mesh = new Points(geometry, material);
-      if (geometry.boundingBox) {
-        const { max, min } = geometry.boundingBox;
-        mesh.position.set(
-          (min.x + max.x) / 2,
-          (max.y + min.y) / 2,
-          (min.z + max.z) / 2
+      const mesh: any = {
+        indices: new Uint32Array(indices),
+        vertices: new Float32Array(vertices),
+        normals: new Float32Array(normals),
+      };
+      const dracoMesh = new encoderModule.Mesh();
+
+      const numFaces = mesh.indices.length / 3;
+      const numPoints = mesh.vertices.length;
+      meshBuilder.AddFacesToMesh(dracoMesh, numFaces, mesh.indices);
+
+      meshBuilder.AddFloatAttribute(
+        dracoMesh,
+        encoderModule.POSITION,
+        numPoints,
+        3,
+        mesh.vertices
+      );
+      if (mesh.hasOwnProperty("normals")) {
+        meshBuilder.AddFloatAttribute(
+          dracoMesh,
+          encoderModule.NORMAL,
+          numPoints,
+          3,
+          mesh.normals
         );
       }
-    } else {
-      const blob = await textureFile.async("blob");
-      const manager = new LoadingManager();
-      manager.addHandler(/\.dds$/i, new DDSLoader());
-      manager.setURLModifier((url) => {
-        //@ts-ignore
-        const newUrl = URL.createObjectURL(blob);
-        return newUrl;
-      });
-      const mtlLoader = new MTLLoader(manager);
-      const mtlContent = await mtlFile.async("string");
-      const materials = mtlLoader.parse(mtlContent, mtlFilePath);
-      const objContent = await objFile.async("blob");
-      mesh = await new OBJLoader().loadAsync(URL.createObjectURL(objContent));
-      mesh.
-      encoder.EncodeMeshToDracoBuffer(mesh)
-    }
-    if (mesh) {
-      if (!fileMap.current.has(fileUrl))
-        fileMap.current.set(fileUrl, mesh.clone());
-      //@ts-ignore
-      if (isShow) loadColliderEnvironment(mesh);
+      if (mesh.hasOwnProperty("colors")) {
+        meshBuilder.AddFloatAttribute(
+          dracoMesh,
+          encoderModule.COLOR,
+          numPoints,
+          3,
+          mesh.colors
+        );
+      }
+      if (mesh.hasOwnProperty("texcoords")) {
+        meshBuilder.AddFloatAttribute(
+          dracoMesh,
+          encoderModule.TEX_COORD,
+          numPoints,
+          3,
+          mesh.texcoords
+        );
+      }
+
+      //   if (method === "edgebreaker") {
+      //     encoder.SetEncodingMethod(encoderModule.MESH_EDGEBREAKER_ENCODING);
+      //   } else if (method === "sequential") {
+      //     encoder.SetEncodingMethod(encoderModule.MESH_SEQUENTIAL_ENCODING);
+      //   }
+
+      const encodedData = new encoderModule.DracoInt8Array();
+      // Use default encoding setting.
+      const encodedLen = encoder.EncodeMeshToDracoBuffer(
+        dracoMesh,
+        encodedData
+      );
+      const outputBuffer = new ArrayBuffer(encodedLen);
+      const outputData = new Int8Array(outputBuffer);
+      for (let i = 0; i < encodedLen; ++i) {
+        outputData[i] = encodedData.GetValue(i);
+      }
+      fs.writeFile(
+        "bunny_10.drc",
+        Buffer.from(outputBuffer),
+        "binary",
+        function (err) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("The file was saved!");
+          }
+        }
+      );
+      encoderModule.destroy(encodedData);
+      encoderModule.destroy(dracoMesh);
+      encoderModule.destroy(encoder);
+      encoderModule.destroy(meshBuilder);
+      logger.info("Compress success");
     }
   } else {
     console.log("response status: " + response.statusText);

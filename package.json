@@ -22,6 +22,7 @@
   "homepage": "https://github.com/angularbinh2020/doducbinh1995api#readme",
   "dependencies": {
     "@types/mysql": "^2.15.21",
+    "axios": "^1.2.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",

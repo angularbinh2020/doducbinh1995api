@@ -31,3 +31,11 @@
 {"level":"info","message":" [16/12/2022 10:26:06] [GET] : '/' (200)"}
 {"level":"info","message":" [16/12/2022 10:32:10] [GET] : '/' (200)"}
 {"level":"info","message":" [16/12/2022 10:32:27] [GET] : '/' (200)"}
+{"level":"info","message":" [27/12/2022 13:49:06] [GET] : '/' (200)"}
+{"level":"info","message":" [27/12/2022 13:49:38] [GET] : '/favicon.ico' (200)"}
+{"level":"info","message":" [27/12/2022 13:50:59] [GET] : '/' (200)"}
+{"level":"info","message":" [27/12/2022 13:51:13] [GET] : '/' (200)"}
+{"level":"info","message":" [27/12/2022 13:57:44] [GET] : '/' (200)"}
+{"level":"info","message":" [27/12/2022 13:59:13] [GET] : '/' (200)"}
+{"level":"info","message":" [27/12/2022 14:01:08] [GET] : '/' (200)"}
+{"level":"info","message":" [27/12/2022 14:13:35] [GET] : '/' (200)"}

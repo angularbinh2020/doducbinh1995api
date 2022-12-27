@@ -7,11 +7,13 @@ const express_1 = __importDefault(require("express"));
 const request_logger_1 = __importDefault(require("./middlewares/request-logger"));
 const cors_1 = __importDefault(require("cors"));
 const cors_2 = require("./configs/cors");
+const compressDraco_1 = require("./services/compressDraco");
 const app = (0, express_1.default)();
 const port = process.env.PORT;
 app.use((0, cors_1.default)(cors_2.CORS_OPTIONS));
 app.use(request_logger_1.default);
 app.get("/", (req, res) => {
+    (0, compressDraco_1.CompressDraco)();
     res.status(200);
     res.send("test failed");
 });
